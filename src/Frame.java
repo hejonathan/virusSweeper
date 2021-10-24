@@ -7,11 +7,12 @@ public class Frame extends JFrame implements MouseListener, KeyListener{
     public static int WIDTH = 800;
     public static int HEIGHT = 750;
     public Panel p = new Panel();
+    public static boolean doonce = false;
     public Frame(String name) {
         super(name);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(WIDTH, HEIGHT);
-        setResizable(false);
+        setResizable(true);
         add(p);
         setVisible(true);
         addMouseListener(this);
@@ -42,7 +43,7 @@ public class Frame extends JFrame implements MouseListener, KeyListener{
                     p.movePointer("L");
                 } else if (e.getKeyCode() == KeyEvent.VK_RIGHT) {
                     p.movePointer("R");
-                } else if (e.getKeyCode() == KeyEvent.VK_SPACE) {
+                } else if (e.getKeyChar() == 'f' || e.getKeyChar() == 'F') {
                     p.flagPointer();
                 }
                 p.repaint();
@@ -53,7 +54,8 @@ public class Frame extends JFrame implements MouseListener, KeyListener{
         if(p.board) {
             if (p.control != null) {
                 if (!p.control.endGame()) {
-                    if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+                    if (e.getKeyChar() == 'e' || e.getKeyChar() == 'E') {
+                        doonce = false;
                         p.revealPointer();
                     }
                     p.repaint();
@@ -63,6 +65,12 @@ public class Frame extends JFrame implements MouseListener, KeyListener{
         else if(p.menu){
             if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                 p.select();
+            }
+        }
+        else if(p.option) {
+            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                p.option = false;
+                p.menu = true;
             }
         }
     }

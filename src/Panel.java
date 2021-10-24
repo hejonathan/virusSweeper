@@ -1,4 +1,6 @@
 import java.awt.*;
+import java.awt.Font;
+import java.io.InputStream;
 import java.awt.image.*;
 import java.awt.Image;
 import java.util.LinkedList;
@@ -7,15 +9,16 @@ import javax.swing.*;
 import static java.lang.System.*;
 
 public class Panel extends JPanel{
+    Font pixFont, pixFont32, pixFont24, pixFont12;
     public final int minx = 90;
     public int minMenux = getWidth()/3 - 70;
     public final int miny = 65;
-    public int minMenuy = getHeight()/5 + 270;
+    public int minMenuy = getHeight()/5 + 280;
     public final int maxx = 710;
     public final int maxy = 685;
     public boolean menu = true, board = false, option = false;
     public Control control;
-    public Image mine, flag, mask, block, virusbustR, virusbustL;
+    public Image mine, flag, mask, block, virusbustR, virusbustL, title;
     public int pointerX = 10, pointerY = 10;
     public int menuPointerY = 0;
     public boolean facingLeft = false;
@@ -27,41 +30,45 @@ public class Panel extends JPanel{
             block = Toolkit.getDefaultToolkit().createImage(Panel.class.getResource("Block.gif"));
             virusbustR = Toolkit.getDefaultToolkit().createImage(Panel.class.getResource("VirusBusterR.gif"));
             virusbustL = Toolkit.getDefaultToolkit().createImage(Panel.class.getResource("VirusBusterL.gif"));
+            title = Toolkit.getDefaultToolkit().createImage(Panel.class.getResource("TitleCard.gif"));
             mine = mine.getScaledInstance(29, 29, Image.SCALE_DEFAULT);
             flag = flag.getScaledInstance(29, 29, Image.SCALE_DEFAULT);
             mask = mask.getScaledInstance(29, 29, Image.SCALE_DEFAULT);
             virusbustR = virusbustR.getScaledInstance(29, 29, Image.SCALE_DEFAULT);
             virusbustL = virusbustL.getScaledInstance(29, 29, Image.SCALE_DEFAULT);
+            title = title.getScaledInstance(609,309,Image.SCALE_DEFAULT);
+            
+            InputStream is = Panel.class.getResourceAsStream("joystix monospace.ttf");
+            InputStream is2 = Panel.class.getResourceAsStream("joystix monospace.ttf");
+            InputStream is3 = Panel.class.getResourceAsStream("joystix monospace.ttf");
+            InputStream is4 = Panel.class.getResourceAsStream("joystix monospace.ttf");
+
+            pixFont = Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(48f);
+            pixFont32 = Font.createFont(Font.TRUETYPE_FONT, is2).deriveFont(32f);
+            pixFont24 = Font.createFont(Font.TRUETYPE_FONT, is3).deriveFont(24f);
+            pixFont12 = Font.createFont(Font.TRUETYPE_FONT, is4).deriveFont(12f);
         } catch (Exception e) {
             out.println("Image error Adam's a stupid idiot. I agree -Will");
         }
     }
 
+    boolean playedSound = false;
     @Override
     protected void paintComponent(Graphics g){
         super.paintComponent(g);
         g.setColor(new Color(150, 150, 150));
         g.fillRect(0, 0, getWidth(), getHeight());
         if(menu){
-            /*g.setColor(Color.darkGray);
-            g.fillRect(getWidth()/3, getHeight()/5, getWidth()/3, 3*getHeight()/5);
-
-            g.setColor(new Color(120, 120, 120));
-            g.fillRect(getWidth()/3 + getWidth()/10, 2*getHeight()/5, getWidth()/3 * 8/10, getHeight()/10);
-            g.fillRect(getWidth()/3 + getWidth()/10, 2*getHeight()/5 + getHeight()/10, getWidth()/3* 8/10, getHeight()/10);
-            g.fillRect(getWidth()/3 + getWidth()/10, 2*getHeight()/5 + 2*getHeight()/10, getWidth()/3 * 8/10, getHeight()/10);
-            g.fillRect(getWidth()/3 + getWidth()/10, 2*getHeight()/5 + 3*getHeight()/10, getWidth()/3 * 8/10, getHeight()/10);
-*/
             g.setColor(Color.WHITE);
-            g.setFont(new Font("New Courier", Font.BOLD, 64));
-            g.drawString("Minesweeper", getWidth()/3 - 25, getHeight()/5 + 30);
 
-            g.setFont(new Font("New Courier", Font.BOLD, 48));
-            minMenux = getWidth()/3 - 20;
-            g.drawString("Easy", minMenux, minMenuy);
-            g.drawString("Medium", minMenux, minMenuy + 100);
-            g.drawString("Hard", minMenux, minMenuy + 200);
-            g.drawString("Options", minMenux, minMenuy + 300);
+            g.setFont(pixFont);
+            minMenux = getWidth()/3;
+            g.drawImage(title, minMenux - 170, 0, this);
+            g.drawRect(minMenux - 170, 50, 609, 213);
+            g.drawString("Easy", minMenux, minMenuy + 40);
+            g.drawString("Medium", minMenux, minMenuy + 140);
+            g.drawString("Hard", minMenux, minMenuy + 240);
+            g.drawString("Story", minMenux, minMenuy + 340);
 
             drawMenuPointer(g);
         }
@@ -72,18 +79,44 @@ public class Panel extends JPanel{
                 drawGridLines(g);
                 drawNumsAll(g);
                 g.setColor(Color.WHITE);
-                g.setFont(new Font("Comic Sans", Font.BOLD, 32));
-                g.drawString("YOU WIN!", getWidth()/2-100, 40);
+                g.setFont(pixFont24);
+                if(!playedSound) {
+                    Runner.playSound("victory.wav");
+                    playedSound = true;
+                }
+                g.drawString("YOU WIN! YOU SUCCESSFULLY ISOLATED COVID-19!", getWidth()/2-210, 40);
             }
             else{
                 drawGridLines(g);
                 drawNumsAll(g);
                 g.setColor(Color.WHITE);
-                g.setFont(new Font("Comic Sans", Font.BOLD, 32));
-                g.drawString("GAMEOVER", getWidth()/2-100, 40);
+                g.setFont(pixFont24);
+                if(!playedSound) {
+                    Runner.playSound("gameover.wav");
+                    playedSound = true;
+                }
+                g.drawString("GAME OVER", getWidth()/2-105, 40);
             }
         }
         else if(option){
+            g.setColor(Color.WHITE);
+            g.setFont(pixFont24);
+            g.drawString("Story", getWidth()/12 - 30, getHeight()/7);
+            g.setFont(pixFont12);
+
+            g.drawString("In a distant city of Tamstown. The life has been peaceful",getWidth()/12 - 30,getHeight()/7+70);
+            g.drawString("until it was hit by the highly contagious virus COVID-19.",getWidth()/12 - 30,getHeight()/7+110);
+            g.drawString( "As a diligent health care worker, Tamsany Fauci, you are ",getWidth()/12 - 30,getHeight()/7+150);
+            g.drawString( "tasked to locate the spots in the town that has been infected.",getWidth()/12 - 30,getHeight()/7+190);
+            g.drawString("  —Use arrow keys to move around on the board",getWidth()/12 - 30,getHeight()/7+230);
+            g.drawString("  —To mark a spot as safe, press E",getWidth()/12 - 30,getHeight()/7+270);
+            g.drawString("  —To mark a spot as infected, press F",getWidth()/12 - 30,getHeight()/7+310);
+            g.drawString("Once you successfully identify all the viruses, the town will",getWidth()/12 - 30,getHeight()/7+350);
+            g.drawString("be saved. Unfortunately, if you identify a place that has been",getWidth()/12 - 30,getHeight()/7+390);
+            g.drawString("infected as safe, you will contract the virus, and you will",getWidth()/12 - 30,getHeight()/7+430);
+            g.drawString( "have to use one of the cures to prevent sickness on yourself.",getWidth()/12 - 30,getHeight()/7+470);
+            g.drawString( "Lives are at stake. Please finish your task ASAP.",getWidth()/12 - 30,getHeight()/7+510);
+            g.drawString( "Press ESC to return to main menu",getWidth()/12 - 30,getHeight()/7+550);
 
         }
     }
@@ -131,7 +164,7 @@ public class Panel extends JPanel{
     }
     public void drawNumMinesLeft(Graphics g){
         g.setColor(Color.BLACK);
-        g.setFont(new Font("Comic Sans", Font.BOLD, 12));
+        g.setFont(pixFont12);
         g.drawImage(mine,minx+120,miny-35,this);
         g.drawString("unrevealed: "+(control.numMines-control.numFlagged-control.minesRevealed),minx+150, miny-15);
     }
@@ -142,7 +175,7 @@ public class Panel extends JPanel{
                     g.drawImage(mine, mapToPixels(i, j)[0]+1, mapToPixels(i, j)[1]+1 , 29, 29, this);
                 }
                 else if (control.count[i][j]!=0) {
-                    g.setFont(new Font("Calibri", 1, 20));
+                    g.setFont(pixFont12);
                     switch (control.count[i][j]) {
                         case 1:
                             g.setColor(Color.BLUE);
@@ -169,7 +202,7 @@ public class Panel extends JPanel{
                             g.setColor(new Color(0, 0, 0));
                             break;
                     }
-                    g.drawString(String.valueOf(control.count[i][j]), mapToPixels(i, j)[0] + 10, mapToPixels(i, j)[1] + 23);
+                    g.drawString(String.valueOf(control.count[i][j]), mapToPixels(i, j)[0] + 10, mapToPixels(i, j)[1] + 21);
                 }
             }
         }
@@ -182,7 +215,7 @@ public class Panel extends JPanel{
                         g.drawImage(mine, mapToPixels(i, j)[0]+1, mapToPixels(i, j)[1]+1 , 29, 29, this);
                     }
                     else if (control.count[i][j]!=0) {
-                        g.setFont(new Font("Calibri", 1, 20));
+                        g.setFont(pixFont12);
                         switch(control.count[i][j]){
                             case 1:
                                 g.setColor(Color.BLUE);
@@ -209,7 +242,7 @@ public class Panel extends JPanel{
                                 g.setColor(new Color(0,0,0));
                                 break;
                         }
-                        g.drawString(String.valueOf(control.count[i][j]), mapToPixels(i, j)[0] + 10, mapToPixels(i, j)[1] + 23);
+                        g.drawString(String.valueOf(control.count[i][j]), mapToPixels(i, j)[0] + 10, mapToPixels(i, j)[1] + 21);
                     }
                 }else{
                     g.drawImage(block, mapToPixels(i, j)[0]+1, mapToPixels(i, j)[1]+1 , 29, 29, this);
@@ -223,11 +256,21 @@ public class Panel extends JPanel{
         drawMask(g);
 
         drawGridLines(g);
-        //drawBlocks(g);
+        drawProgress(g);
         drawNums(g);
         drawFlags(g);
         drawNumMinesLeft(g);
         drawPointer(g);
+    }
+    public void drawProgress(Graphics g) {
+        int length = (int)(255*control.progress());
+
+        g.setColor(Color.BLACK);
+        g.drawRect(getWidth()/2, 40, 255, 15);
+        g.setColor(Color.GRAY);
+        g.setColor(new Color(255-length, length, length));
+        g.fillRect(getWidth()/2+1, 41, length, 13);
+
     }
     public void drawPointer(Graphics g){
         g.drawImage(facingLeft? virusbustL:virusbustR, minx + pointerX * 31 + 1, miny + pointerY * 31 + 1, 29, 29, this);
@@ -235,7 +278,7 @@ public class Panel extends JPanel{
     }
     public void drawMenuPointer(Graphics g){
         g.setColor(Color.WHITE);
-        g.drawRoundRect(minMenux - 10, minMenuy-40 +100 * menuPointerY, 700, 50, 25, 25);
+        g.drawRoundRect(minMenux - 15, minMenuy - 7 + 100 * menuPointerY, 300, 60, 25, 25);
     }
     public void flagPointer(){
         /*if (control.revealed[pointerX][pointerY])

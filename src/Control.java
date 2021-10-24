@@ -42,6 +42,10 @@ public class Control {
     //Returns true when successfully revealed location x, y (KILL PLAYER IF FALSE)
     public boolean reveal (int x, int y) {
         if (mine[x][y]) {
+            if(!Frame.doonce) {
+                Runner.playSound("uhoh.wav");
+                Frame.doonce = true;
+            }
             if(numMask>0){
                 numMask--;
                 System.out.println("mask used");
@@ -50,6 +54,10 @@ public class Control {
                 return true;
             }
             return false;
+        }
+        if(!Frame.doonce) {
+            Runner.playSound("nicemove.wav");
+            Frame.doonce = true;
         }
         revealed[x][y] = true;
         if (count[x][y]!=0) return true;
@@ -96,5 +104,14 @@ public class Control {
         if(numMask == 0)
             return true;
         return isFinished();
+    }
+    public double progress() {
+        int cnt = 0;
+        for (int i=0; i<20; i++) {
+            for (int j=0; j<20; j++) {
+                if (!mine[i][j] && revealed[i][j])cnt++;
+            }
+        }
+        return (double)cnt/(400-numMines);
     }
 }
