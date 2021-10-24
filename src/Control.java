@@ -55,7 +55,7 @@ public class Control {
             }
             return false;
         }
-        if(!Frame.doonce) {
+        if(!Frame.doonce && !revealed[x][y]) {
             Runner.playSound("nicemove.wav");
             Frame.doonce = true;
         }
